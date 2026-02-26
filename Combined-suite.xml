@@ -1,0 +1,7 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="CombinedSuite">
+    <suite-files>
+        <suite-file path="testng-parallel.xml"/>
+        <suite-file path="testng-seq.xml"/>
+    </suite-files>
+</suite>

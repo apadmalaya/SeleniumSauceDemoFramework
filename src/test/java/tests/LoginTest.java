@@ -7,6 +7,8 @@ import jdk.jfr.Description;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.testng.Assert;
+import org.testng.ITest;
+import org.testng.ITestContext;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
@@ -15,7 +17,8 @@ import pages.LoginPage;
 import java.io.ByteArrayInputStream;
 
 @Listeners({AllureTestNg.class})
-public class LoginTest extends BaseTest {
+public class LoginTest extends BaseTest implements ITest {
+  private String testName;
 
   /*  @Test(description = "Valid login with standard user")
     @Description("Login with valid credentials and verify the login is successful")
@@ -54,12 +57,21 @@ public class LoginTest extends BaseTest {
     }
     @Test(description = "Data provider tests",dataProvider = "loginData")
     @Description("Validate all login with multople data")
-    public void validLoginWithAllTests(String username, String password, String results)
+    public void validLoginWithAllTests(String username, String password, String results, ITestContext context)
     {
+      String browser = context.getCurrentXmlTest().getParameter("browser");
+      // Dynamic test name
+      testName = "LoginTest_" + browser + "_" + (username.isEmpty() ? "emptyUser" : username);
+      Allure.step("Test name=" +testName);
+      // Log step in Allure
+      Allure.step("Running on browser: " + browser + " | User: " + (username.isEmpty() ? "EMPTY" : username));
+
       LoginPage page = new LoginPage(driver);
       page.enterUserName(username);
       page.enterPassword(password);
       page.clickLogin();
+
+      Allure.step("Running on browser: " + browser + " | User: " + username);
       if(results.equals("success"))
       {
           Assert.assertTrue(driver.getCurrentUrl().contains("inventory.html"),"Login Failed");
@@ -70,5 +82,9 @@ public class LoginTest extends BaseTest {
 
     }
 
+  @Override
+  public String getTestName() {
+    return testName; // Allure + TestNG will use this as the test display name
+  }
 
 }
